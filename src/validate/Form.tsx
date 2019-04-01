@@ -133,8 +133,8 @@ class Form extends React.Component<IProps, IState> {
           });
         }}
         error={error}
-        errorInputStyle={this.props.errorInputClassName}
-        errorStyle={this.props.errorClassName}
+        errorInputClassName={this.props.errorInputClassName}
+        errorClassName={this.props.errorClassName}
       />
     )
   );
