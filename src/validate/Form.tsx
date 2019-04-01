@@ -20,9 +20,9 @@ interface IProps {
   validate: IValidateFunction;
   submit: (values: ValueMap) => void;
   initialValues?: ValueMap;
-  errorInputStyle?: string;
-  errorStyle?: string;
-  formStyle?: string;
+  errorInputClassName?: string;
+  errorClassName?: string;
+  formClassName?: string;
 }
 
 interface IState {
@@ -133,8 +133,8 @@ class Form extends React.Component<IProps, IState> {
           });
         }}
         error={error}
-        errorInputStyle={this.props.errorInputStyle}
-        errorStyle={this.props.errorStyle}
+        errorInputStyle={this.props.errorInputClassName}
+        errorStyle={this.props.errorClassName}
       />
     )
   );
@@ -166,9 +166,9 @@ class Form extends React.Component<IProps, IState> {
   };
 
   render() {
-    const { children, formStyle } = this.props;
+    const { children, formClassName } = this.props;
     return (
-      <form onSubmit={this.handleSubmit} className={formStyle}>
+      <form onSubmit={this.handleSubmit} className={formClassName}>
         {this.renderChildren(children)}
       </form>
     );

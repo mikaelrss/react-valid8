@@ -10,19 +10,85 @@
 npm install --save react-valid8
 ```
 
+or
+
+```
+yarn add react-valid8
+```
+
 ## Usage
 
-```tsx
-import * as React from 'react'
+react-valid8 follows a redux-form style way of validating forms. It provides a simple way of
+displaying error messages by their rightful input fields. Just wrap your input fields in the `Form`
+component, and give the field a `name` property, and `react-valid8` will automatically pick up the input
+field and give the correct errors to the correct fields.
 
-import MyComponent from 'react-valid8'
+```jsx harmony
+import React from "react";
+import Form from "react-valid8";
 
-class Example extends React.Component {
-  render () {
+class MyComponent extends React.Component {
+  handleSubmit = values => {
+    // Retrieves the values from the form so you can do whatever you like in your submit
+  };
+
+  validateValues = values => {
+    const errors = {};
+    if (!values.title) errors.title = "Title is required";
+    if (!values.description) errors.description = "Description is required";
+    if (!values.category) errors.category = "Category is required";
+    if (!values.amount) errors.amount = "Amount is required";
+    if (isNaN(values.amount)) errors.amount = "Amount must be a number";
+    return errors;
+  };
+
+  render() {
     return (
-      <MyComponent />
-    )
+      <Form
+        validate={this.validateValues}
+        submit={this.handleSubmit}
+        initialValues={{
+          title: "Very title",
+          category: "Option A",
+          testName: 12
+        }}
+      >
+        <label>
+          This is a label, nesting the named field
+          <input type="text" name="title" />
+        </label>
+        <input />
+        <input type="textarea" name="description" />
+        <select name="category">
+          <option>Option A</option>
+          <option>Option B</option>
+          <option>Option C</option>
+        </select>
+        <input type="text" name="amount" />
+        <input />
+        <button>Submit</button>
+      </Form>
+    );
   }
+}
+```
+
+## Props
+
+```typescript jsx
+type IMap = {
+  [key: string]: any;
+};
+
+interface IProps {
+  validate: (values: IMap) => IMap; // custom function to provide error messages based on validation
+  //provides error messages to fields corresponding to kep value
+  submit: (values: IMap) => void; // custom function for handling submitting.
+  // Will be called when the form has no errors
+  initialValues?: IMap; // an object containing initial values of fields. (optional)
+  errorInputClassName?: string; // className to style the input field on error (optional)
+  errorClassName?: string; // className to style the error message field on error (optional)
+  formClassName?: string; // className to style the form (optional)
 }
 ```
 
