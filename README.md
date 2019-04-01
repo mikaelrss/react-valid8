@@ -50,7 +50,7 @@ class MyComponent extends React.Component {
         initialValues={{
           title: "Very title",
           category: "Option A",
-          testName: 12
+          amount: 12
         }}
       >
         <label>
