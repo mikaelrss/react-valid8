@@ -1,4 +1,6 @@
 import * as React from "react";
+// @ts-ignore
+import moize from "moize";
 
 import ErrorInput from "./ErrorInput";
 
@@ -107,37 +109,41 @@ class Form extends React.Component<IProps, IState> {
     if (Object.keys(errors).length <= 0) submit(values);
   };
 
-  renderErrorInput = (
-    name: string,
-    elem: React.ReactElement,
-    error: string
-  ) => (
-    <ErrorInput
-      key={name}
-      elem={elem}
-      fieldState={this.state[name]}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-        this.setValueState(name, {
-          value: e.target.value
-        });
-      }}
-      onBlur={() => {
-        this.setValueState(name, {
-          // @ts-ignore
-          ...this.state[name],
-          pristine: false
-        });
-      }}
-      error={error}
-      errorInputStyle={this.props.errorInputStyle}
-      errorStyle={this.props.errorStyle}
-    />
+  renderErrorInput = moize(
+    (
+      name: string,
+      elem: React.ReactElement,
+      error: string,
+      fieldState: IFieldState
+    ) => (
+      <ErrorInput
+        key={name}
+        elem={elem}
+        fieldState={fieldState}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          this.setValueState(name, {
+            value: e.target.value
+          });
+        }}
+        onBlur={() => {
+          this.setValueState(name, {
+            // @ts-ignore
+            ...this.state[name],
+            pristine: false
+          });
+        }}
+        error={error}
+        errorInputStyle={this.props.errorInputStyle}
+        errorStyle={this.props.errorStyle}
+      />
+    )
   );
 
   findValueElement = (elem: React.ReactElement, errors: any): any => {
     if (!elem.props) return elem;
     const { name, children } = elem.props;
-    if (name) return this.renderErrorInput(name, elem, errors[name]);
+    if (name)
+      return this.renderErrorInput(name, elem, errors[name], this.state[name]);
     if (children) {
       return React.cloneElement(elem, {
         ...elem.props,
@@ -150,14 +156,20 @@ class Form extends React.Component<IProps, IState> {
     return elem;
   };
 
-  render() {
-    const { children, validate, formStyle } = this.props;
+  renderChildren = (children: React.ReactNode) => {
+    const { validate } = this.props;
     const errors = validate(this.mapStateToValues());
     const valueElementErrors = (elem: React.ReactElement) =>
       this.findValueElement(elem, errors);
+
+    return React.Children.map(children, valueElementErrors);
+  };
+
+  render() {
+    const { children, formStyle } = this.props;
     return (
       <form onSubmit={this.handleSubmit} className={formStyle}>
-        {React.Children.map(children, valueElementErrors)}
+        {this.renderChildren(children)}
       </form>
     );
   }
