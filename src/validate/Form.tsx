@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import style from "./style.css";
 import ErrorInput from "./ErrorInput";
 
 type ValueMap = { [key: string]: string | number | null };
@@ -19,13 +18,16 @@ interface IProps {
   validate: IValidateFunction;
   submit: (values: ValueMap) => void;
   initialValues?: ValueMap;
+  errorInputStyle?: string;
+  errorStyle?: string;
+  formStyle?: string;
 }
 
 interface IState {
   [key: string]: IFieldState;
 }
 
-class FormParent extends React.Component<IProps, IState> {
+class Form extends React.Component<IProps, IState> {
   state = {};
 
   componentDidMount() {
@@ -41,24 +43,32 @@ class FormParent extends React.Component<IProps, IState> {
       {}
     );
 
-  isElementValue = (elem: React.ReactElement) => !!elem.props.name;
-
   allFieldsPristine = () =>
     Object.values(this.state).every((field: IFieldState) => !!field.pristine);
 
   setInitialValues = () => {
     const { children } = this.props;
     const fields = {};
-    React.Children.map(children, (elem: React.ReactElement) => {
+    // @ts-ignore
+    const childs = React.Children.toArray(children)
+      .reduce(
+        (arr: React.ReactElement[], el: React.ReactElement) => [
+          ...arr,
+          el,
+          ...el.props.children
+        ],
+        []
+      )
+      // @ts-ignore
+      .filter(element => element && element.props && element.props.name);
+    childs.forEach((elem: React.ReactElement) => {
       const name = elem.props.name;
-      if (this.isElementValue(elem)) {
-        fields[name] = {
-          value: this.props.initialValues
-            ? this.props.initialValues[name] || ""
-            : "",
-          pristine: true
-        };
-      }
+      fields[name] = {
+        value: this.props.initialValues
+          ? this.props.initialValues[name] || ""
+          : "",
+        pristine: true
+      };
     });
 
     this.setState(fields);
@@ -93,40 +103,64 @@ class FormParent extends React.Component<IProps, IState> {
       return;
     }
     const values = this.mapStateToValues();
-    if (Object.keys(validate(values)).length <= 0) submit(values);
+    const errors = validate(values);
+    if (Object.keys(errors).length <= 0) submit(values);
+  };
+
+  renderErrorInput = (
+    name: string,
+    elem: React.ReactElement,
+    error: string
+  ) => (
+    <ErrorInput
+      key={name}
+      elem={elem}
+      fieldState={this.state[name]}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        this.setValueState(name, {
+          value: e.target.value
+        });
+      }}
+      onBlur={() => {
+        this.setValueState(name, {
+          // @ts-ignore
+          ...this.state[name],
+          pristine: false
+        });
+      }}
+      error={error}
+      errorInputStyle={this.props.errorInputStyle}
+      errorStyle={this.props.errorStyle}
+    />
+  );
+
+  findValueElement = (elem: React.ReactElement, errors: any): any => {
+    if (!elem.props) return elem;
+    const { name, children } = elem.props;
+    if (name) return this.renderErrorInput(name, elem, errors[name]);
+    if (children) {
+      return React.cloneElement(elem, {
+        ...elem.props,
+        children: React.Children.map(
+          elem.props.children,
+          (child: React.ReactElement) => this.findValueElement(child, errors)
+        )
+      });
+    }
+    return elem;
   };
 
   render() {
-    const { children, validate } = this.props;
+    const { children, validate, formStyle } = this.props;
     const errors = validate(this.mapStateToValues());
+    const valueElementErrors = (elem: React.ReactElement) =>
+      this.findValueElement(elem, errors);
     return (
-      <form onSubmit={this.handleSubmit} className={style.columns}>
-        {React.Children.map(children, (elem: React.ReactElement) => {
-          const { name } = elem.props;
-          if (!name) return React.cloneElement(elem);
-          return (
-            <ErrorInput
-              key={name}
-              elem={elem}
-              fieldState={this.state[name]}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                this.setValueState(name, {
-                  value: e.target.value
-                });
-              }}
-              onBlur={() => {
-                this.setValueState(name, {
-                  ...this.state[name],
-                  pristine: false
-                });
-              }}
-              error={errors[name]}
-            />
-          );
-        })}
+      <form onSubmit={this.handleSubmit} className={formStyle}>
+        {React.Children.map(children, valueElementErrors)}
       </form>
     );
   }
 }
 
-export default FormParent;
+export default Form;

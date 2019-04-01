@@ -1,8 +1,0 @@
-:local(.columns) {
-  display: flex;
-  flex-direction: column;
-}
-
-:local(.error) {
-  color: red;
-}
