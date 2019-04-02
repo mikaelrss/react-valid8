@@ -46,8 +46,8 @@ class Form extends React.Component<IProps, IState> {
       {}
     );
 
-  allFieldsPristine = () =>
-    Object.values(this.state).every((field: IFieldState) => !!field.pristine);
+  someFieldsPristine = () =>
+    Object.values(this.state).some((field: IFieldState) => !!field.pristine);
 
   setInitialValues = () => {
     const { children } = this.props;
@@ -100,11 +100,8 @@ class Form extends React.Component<IProps, IState> {
 
   handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
+    if (this.someFieldsPristine()) this.setFormAsTouched();
     const { validate, submit } = this.props;
-    if (this.allFieldsPristine()) {
-      this.setFormAsTouched();
-      return;
-    }
     const values = this.mapStateToValues();
     const errors = validate(values);
     if (Object.keys(errors).length <= 0) submit(values);
