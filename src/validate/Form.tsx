@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import moize from "moize";
 import isUrl from "is-url";
 
@@ -129,9 +129,11 @@ class Form extends React.Component<IProps, IState> {
         key={name}
         elem={elem}
         fieldState={fieldState}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={({
+          currentTarget: { value, checked }
+        }: ChangeEvent<HTMLInputElement>) => {
           this.setValueState(name, {
-            value: e.currentTarget.value
+            value: value === "on" ? checked : value
           });
         }}
         onBlur={() => {
