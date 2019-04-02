@@ -18,6 +18,7 @@ export interface IFieldState {
 interface IProps {
   validate: IValidateFunction;
   submit: (values: ValueMap) => void;
+  injectErrorAsProps?: boolean;
   children?: React.ReactNode;
   initialValues?: ValueMap;
   errorInputClassName?: string;
@@ -122,7 +123,7 @@ class Form extends React.Component<IProps, IState> {
         fieldState={fieldState}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           this.setValueState(name, {
-            value: e.target.value
+            value: e.currentTarget.value
           });
         }}
         onBlur={() => {
@@ -132,6 +133,7 @@ class Form extends React.Component<IProps, IState> {
             pristine: false
           });
         }}
+        injectErrorAsProps={this.props.injectErrorAsProps}
         error={error}
         errorInputClassName={this.props.errorInputClassName}
         errorClassName={this.props.errorClassName}

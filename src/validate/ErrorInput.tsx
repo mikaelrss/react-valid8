@@ -8,6 +8,7 @@ type IProps = {
   fieldState: IFieldState;
   onChange: any;
   onBlur: any;
+  injectErrorAsProps?: boolean;
   error?: string;
   errorInputClassName?: string;
   errorClassName?: string;
@@ -20,24 +21,36 @@ const ErrorInput = ({
   error,
   onBlur,
   errorInputClassName,
-  errorClassName
+  errorClassName,
+  injectErrorAsProps
 }: IProps) => {
   const value = fieldState ? fieldState.value : "";
-  const pristine = fieldState ? fieldState.pristine : true;
-  const hasError = !pristine && !!error;
+  const pristine = fieldState ? fieldState.pristine || false : true;
+  const shouldShowError = !pristine && !!error;
+  const shouldInject = injectErrorAsProps || elem.props.injectErrorAsProps;
+  const injectProps = shouldInject
+    ? {
+        error,
+        showError: shouldShowError
+      }
+    : {};
   return (
     <>
       {React.cloneElement(elem, {
+        ...elem.props,
         value,
         onChange,
         onBlur,
         className: classNames(elem.props.className, {
-          [errorInputClassName || ""]: hasError
+          [errorInputClassName || ""]: shouldShowError
         }),
-        "aria-invalid": hasError
+        "aria-invalid": shouldShowError,
+        ...injectProps
       })}
-      {hasError && (
-        <span className={classNames({ [errorClassName || ""]: hasError })}>
+      {shouldShowError && !shouldInject && (
+        <span
+          className={classNames({ [errorClassName || ""]: shouldShowError })}
+        >
           {error}
         </span>
       )}

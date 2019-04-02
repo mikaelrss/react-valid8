@@ -28,12 +28,12 @@ export default class App extends Component {
           initialValues={{
             testName: 12
           }}
+          injectAsProps
         >
           <label>
             This is a label, nesting the named field
             <input type="text" name="title" />
           </label>
-          <input />
           <input type="textarea" name="description" />
           <select name="category">
             <option>Option A</option>
@@ -41,7 +41,6 @@ export default class App extends Component {
             <option>Option C</option>
           </select>
           <input type="text" name="testName" />
-          <input />
           <button>Submit</button>
         </Form>
       </div>
