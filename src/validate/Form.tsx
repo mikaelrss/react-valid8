@@ -16,9 +16,9 @@ export interface IFieldState {
 }
 
 interface IProps {
-  children: React.ReactNode;
   validate: IValidateFunction;
   submit: (values: ValueMap) => void;
+  children?: React.ReactNode;
   initialValues?: ValueMap;
   errorInputClassName?: string;
   errorClassName?: string;
