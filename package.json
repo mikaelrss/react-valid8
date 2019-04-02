@@ -22,7 +22,9 @@
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
+    "@types/is-url": "^1.2.28",
     "classnames": "^2.2.6",
+    "is-url": "^1.2.4",
     "moize": "^5.4.3"
   },
   "peerDependencies": {

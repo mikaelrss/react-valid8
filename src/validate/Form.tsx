@@ -1,6 +1,6 @@
-import * as React from "react";
-// @ts-ignore
+import React from "react";
 import moize from "moize";
+import isUrl from "is-url";
 
 import ErrorInput from "./ErrorInput";
 
@@ -8,7 +8,11 @@ type ValueMap = { [key: string]: string | number | null };
 
 type ErrorMap = ValueMap | {};
 
-type IValidateFunction = (values: ValueMap) => ErrorMap;
+export type UtilFunctions = {
+  isUrl: (url: string) => boolean;
+};
+
+type IValidateFunction = (values: ValueMap, utils?: UtilFunctions) => ErrorMap;
 
 export interface IFieldState {
   value: any;
@@ -36,6 +40,10 @@ class Form extends React.Component<IProps, IState> {
   componentDidMount() {
     this.setInitialValues();
   }
+
+  utils: UtilFunctions = {
+    isUrl
+  };
 
   mapStateToValues = () =>
     Object.keys(this.state).reduce(
@@ -98,12 +106,15 @@ class Form extends React.Component<IProps, IState> {
     });
   };
 
+  validate = (values: ValueMap): ErrorMap =>
+    this.props.validate(values, this.utils);
+
   handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
     if (this.someFieldsPristine()) this.setFormAsTouched();
-    const { validate, submit } = this.props;
+    const { submit } = this.props;
     const values = this.mapStateToValues();
-    const errors = validate(values);
+    const errors = this.validate(values);
     if (Object.keys(errors).length <= 0) submit(values);
   };
 
@@ -156,8 +167,7 @@ class Form extends React.Component<IProps, IState> {
   };
 
   renderChildren = (children: React.ReactNode) => {
-    const { validate } = this.props;
-    const errors = validate(this.mapStateToValues());
+    const errors = this.validate(this.mapStateToValues());
     const valueElementErrors = (elem: React.ReactElement) =>
       this.findValueElement(elem, errors);
 
