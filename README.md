@@ -95,15 +95,25 @@ interface IProps {
 
 ### Child component props
 
-Each child of the `Form` component that wants to register error messages needs to be decorated with the 
+Each child of the `Form` component that wants to register error messages needs to be decorated with the
 `name` prop. In addition to this, each component can add an optional `injectErrorAsProps` which is a `boolean`
 that specifies whether the errors should be injected to the child component as props. This is set to `false`
-by default. When this is `false` a `span` with the error message as content an the `className` 
+by default. When this is `false` a `span` with the error message as content an the `className`
 prop set to `errorClassName` will be placed directly adjacent to the child component of `Form`.
 
-When this value is `true` `Form` will not display the error message automatically, but rather pass it as a 
+When this value is `true` `Form` will not display the error message automatically, but rather pass it as a
 prop to the child component.
 
+### Validation Function
+
+The validation function will be injected with an object with some common validation functions, which can
+be used to do validation on fields like urls.
+
+```
+type UtilFunctions = { 
+  isUrl: (url: string) => boolean; 
+}
+```
 
 ## License
 

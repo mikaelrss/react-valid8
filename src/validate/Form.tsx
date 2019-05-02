@@ -19,7 +19,7 @@ export interface IFieldState {
   pristine?: boolean;
 }
 
-interface IProps {
+export interface IProps {
   validate: IValidateFunction;
   submit: (values: ValueMap) => void;
   injectErrorAsProps?: boolean;
@@ -38,6 +38,7 @@ class Form extends React.Component<IProps, IState> {
   state = {};
 
   componentDidMount() {
+    console.log("HOLLO HOT RELEAD");
     this.setInitialValues();
   }
 

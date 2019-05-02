@@ -14,6 +14,11 @@ type IProps = {
   errorClassName?: string;
 };
 
+export interface IInjectProps {
+  error: string;
+  showError: boolean;
+}
+
 const ErrorInput = ({
   elem,
   fieldState,
