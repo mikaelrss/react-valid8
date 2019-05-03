@@ -38,7 +38,6 @@ class Form extends React.Component<IProps, IState> {
   state = {};
 
   componentDidMount() {
-    console.log("HOLLO HOT RELEAD");
     this.setInitialValues();
   }
 
