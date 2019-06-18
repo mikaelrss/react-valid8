@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import moize from "moize";
 import isUrl from "is-url";
 
@@ -63,7 +63,7 @@ class Form extends React.Component<IProps, IState> {
     // @ts-ignore
     const childs = React.Children.toArray(children)
       .reduce(
-        (arr: React.ReactElement[], el: React.ReactElement) => [
+        (arr: ReactElement[], el: ReactElement) => [
           ...arr,
           el,
           ...el.props.children
@@ -129,9 +129,9 @@ class Form extends React.Component<IProps, IState> {
         key={name}
         elem={elem}
         fieldState={fieldState}
-        onChange={({
-          currentTarget: { value, checked }
-        }: ChangeEvent<HTMLInputElement>) => {
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          elem.props.onChange(event);
+          const { checked, value } = event.currentTarget;
           this.setValueState(name, {
             value: value === "on" ? checked : value
           });
@@ -172,7 +172,6 @@ class Form extends React.Component<IProps, IState> {
     const errors = this.validate(this.mapStateToValues());
     const valueElementErrors = (elem: React.ReactElement) =>
       this.findValueElement(elem, errors);
-
     return React.Children.map(children, valueElementErrors);
   };
 
