@@ -130,7 +130,9 @@ class Form extends React.Component<IProps, IState> {
         elem={elem}
         fieldState={fieldState}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          elem.props.onChange(event);
+          if (typeof elem.props.onChange === "function") {
+            elem.props.onChange(event);
+          }
           const { checked, value } = event.currentTarget;
           this.setValueState(name, {
             value: value === "on" ? checked : value
